@@ -1,6 +1,15 @@
 <?php
+
+//the $password & $pw_hash variables below are hard coded for quick testing purposes.
+//I, for example, have local dev board with a user named 335forum & password 335forum. 
+//$pw_hash is from phpbb database's user_password column in users table
+$password = '335forum';
+$pw_hash = '$argon2id$v=19$m=65536,t=4,p=2$SlBGTkIvaVhrcFZCUWlSag$z7zLTWtOx2MYD/rsL9g9FDp6okbs+zrl4vnk40eBKmM';
+
+//include required classes...
 require_once('./phpbb/config/config.php');
 require_once('./phpbb/passwords/helper.php');
+require_once('./phpbb/passwords/driver/helper.php');
 require_once('./phpbb/passwords/driver/driver_interface.php');
 require_once('./phpbb/passwords/driver/rehashable_driver_interface.php');
 require_once('./phpbb/passwords/manager.php');
@@ -19,14 +28,8 @@ require_once('./phpbb/passwords/driver/md5_vb.php');
 require_once('./phpbb/passwords/driver/sha_xf1.php');
 require_once('./phpbb/passwords/driver/argon2i.php');
 require_once('./phpbb/passwords/driver/argon2id.php');
-require_once('./phpbb/passwords/driver/helper.php');
 
-//the $supplied_password & $hash variables below are hard coded for quick testing purposes.
-//I have local dev board with a user named 335forum & password 335forum. 
-//$hash is from phpbb database's user_password column in users table
-$supplied_password = '335forum';
-$hash = '$argon2id$v=19$m=65536,t=4,p=2$SlBGTkIvaVhrcFZCUWlSag$z7zLTWtOx2MYD/rsL9g9FDp6okbs+zrl4vnk40eBKmM';
-
+//set variables to be passed to manager metod in passwords/manager.php class...
 $config = new \phpbb\config\config(array());
 $passwords_helper = new \phpbb\passwords\helper($config);
 $passwords_driver_helper = new \phpbb\passwords\driver\helper($config);
@@ -41,15 +44,19 @@ $passwords_drivers = array(
 	'passwords.driver.sha1_wcf1'		=> new \phpbb\passwords\driver\sha1_wcf1($config, $passwords_driver_helper),
 	'passwords.driver.md5_mybb'		=> new \phpbb\passwords\driver\md5_mybb($config, $passwords_driver_helper),
 	'passwords.driver.md5_vb'		=> new \phpbb\passwords\driver\md5_vb($config, $passwords_driver_helper),
-	'passwords.driver.sha_xf1'	=> new \phpbb\passwords\driver\sha_xf1($config, $passwords_driver_helper),
+	'passwords.driver.sha_xf1'              => new \phpbb\passwords\driver\sha_xf1($config, $passwords_driver_helper),
     	'passwords.driver.argon2i'		=> new \phpbb\passwords\driver\argon2i($config, $passwords_driver_helper),
     	'passwords.driver.argon2id'		=> new \phpbb\passwords\driver\argon2id($config, $passwords_driver_helper),
 );
 
-$passwords_manager = new \phpbb\passwords\manager($config, $passwords_drivers, $passwords_helper, array_keys($passwords_drivers));
-$correct_password = $passwords_manager->check($supplied_password, $hash);
+//create instance of passwords\manager.php class...
+$pw_manager = new \phpbb\passwords\manager($config, $passwords_drivers, $passwords_helper, array_keys($passwords_drivers));
 
-if($correct_password) {
+//run check...
+$is_correct_password = $pw_manager->check($password, $pw_hash);
+
+//display if password is or is not good...
+if($is_correct_password) {
     echo 'correct password';
 } else {
     echo 'incorrect password';
