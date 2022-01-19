@@ -29,7 +29,7 @@ require_once('./phpbb/passwords/driver/sha_xf1.php');
 require_once('./phpbb/passwords/driver/argon2i.php');
 require_once('./phpbb/passwords/driver/argon2id.php');
 
-//set variables to be passed to manager metod in passwords/manager.php class...
+//set variables to be passed to manager metod in ./phpbb/passwords/manager.php class...
 $config = new \phpbb\config\config(array());
 $passwords_helper = new \phpbb\passwords\helper($config);
 $passwords_driver_helper = new \phpbb\passwords\driver\helper($config);
@@ -49,13 +49,13 @@ $passwords_drivers = array(
     	'passwords.driver.argon2id'		=> new \phpbb\passwords\driver\argon2id($config, $passwords_driver_helper),
 );
 
-//create instance of passwords\manager.php class...
+//create instance of ./phpbb/passwords/manager.php class...
 $pw_manager = new \phpbb\passwords\manager($config, $passwords_drivers, $passwords_helper, array_keys($passwords_drivers));
 
 //run check...
 $is_correct_password = $pw_manager->check($password, $pw_hash);
 
-//display if password is or is not good...
+//display if password is or is not correct...
 if($is_correct_password) {
     echo 'correct password';
 } else {
